@@ -29,6 +29,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv" />
+        app:layout_constraintTop_toBottomOf="@+id/tv"
+        app:fanSpeed1="#F43737"
+        app:fanSpeed2="#ECCE3A"
+        app:fanSpeed3="#69F437"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

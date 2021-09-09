@@ -5,6 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import androidx.annotation.StringRes
+import androidx.core.content.withStyledAttributes
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -42,6 +43,10 @@ class DialView @JvmOverloads constructor(
   // position variable which will be used to draw label and indicator circle position
   private var pointPosition: PointF = PointF(0f, 0f)
 
+  private var fanSpeed1Color = Color.GREEN
+  private var fanSpeed2Color = Color.GREEN
+  private var fanSpeed3Color = Color.GREEN
+
   private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
     style = Paint.Style.FILL
     textAlign = Paint.Align.CENTER
@@ -51,6 +56,11 @@ class DialView @JvmOverloads constructor(
 
   init {
     isClickable = true
+    context.withStyledAttributes(attrs, R.styleable.DialView) {
+      fanSpeed1Color = getColor(R.styleable.DialView_fanSpeed1, 0)
+      fanSpeed2Color = getColor(R.styleable.DialView_fanSpeed2, 0)
+      fanSpeed3Color = getColor(R.styleable.DialView_fanSpeed3, 0)
+    }
   }
 
   override fun onSizeChanged(
@@ -62,12 +72,18 @@ class DialView @JvmOverloads constructor(
     radius = (min(h, w) / 2.0 * 0.8).toFloat()
   }
 
+  private fun getFanColor(): Int = when(fanSpeed) {
+    FanSpeed.OFF -> Color.GRAY
+    FanSpeed.LOW -> fanSpeed1Color
+    FanSpeed.MEDIUM -> fanSpeed2Color
+    FanSpeed.HIGH -> fanSpeed3Color
+  }
+
   override fun onDraw(canvas: Canvas) {
     //super.onDraw(canvas)
 
     //1. draw the circle background
-    paint.color = if(fanSpeed == FanSpeed.OFF) Color.GRAY
-    else Color.GREEN
+    paint.color = getFanColor()
     canvas.drawCircle(
       width.div(2).toFloat(),
       height.div(2).toFloat(),

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.StringRes
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -11,11 +12,19 @@ import kotlin.math.sin
 private const val RADIUS_OFFSET_LABEL = 30
 private const val RADIUS_OFFSET_INDICATOR = -35
 
-private enum class FanSpeed(val label: Int) {
+private enum class FanSpeed(@StringRes val label: Int) {
   OFF(R.string.fan_off),
   LOW(R.string.fan_low),
   MEDIUM(R.string.fan_medium),
   HIGH(R.string.fan_high),
+  ;
+
+  fun next(): FanSpeed = when(this) {
+    OFF -> LOW
+    LOW -> MEDIUM
+    MEDIUM -> HIGH
+    HIGH -> OFF
+  }
 }
 
 
@@ -69,12 +78,13 @@ class DialView @JvmOverloads constructor(
     canvas.drawCircle(
       pointPosition.x,
       pointPosition.y,
-      indicatorRadius,
+      radius / 12,
       paint,
     )
 
     //3. Draw texts / labels
     val labelRadius = radius + RADIUS_OFFSET_LABEL
+    paint.color = Color.WHITE
     for(speed in FanSpeed.values()) {
       pointPosition.computeXY(speed, labelRadius)
       canvas.drawText(
@@ -84,6 +94,16 @@ class DialView @JvmOverloads constructor(
         paint,
       )
     }
+  }
+
+  override fun performClick(): Boolean {
+    if(super.performClick()) return true
+
+    fanSpeed = fanSpeed.next()
+    contentDescription = resources.getString(fanSpeed.label)
+
+    invalidate()
+    return true
   }
 
   private fun PointF.computeXY(fanSpeed: FanSpeed, radius: Float) {

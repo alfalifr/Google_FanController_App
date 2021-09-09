@@ -49,6 +49,10 @@ class DialView @JvmOverloads constructor(
     typeface = Typeface.create("", Typeface.BOLD)
   }
 
+  init {
+    isClickable = true
+  }
+
   override fun onSizeChanged(
     w: Int,
     h: Int,

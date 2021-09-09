@@ -4,8 +4,12 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
+import android.view.accessibility.AccessibilityNodeInfo
 import androidx.annotation.StringRes
 import androidx.core.content.withStyledAttributes
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
@@ -61,6 +65,47 @@ class DialView @JvmOverloads constructor(
       fanSpeed2Color = getColor(R.styleable.DialView_fanSpeed2, 0)
       fanSpeed3Color = getColor(R.styleable.DialView_fanSpeed3, 0)
     }
+    updateContentDesc()
+
+    ViewCompat.setAccessibilityDelegate(this, object: AccessibilityDelegateCompat() {
+      /**
+       * Initializes an [AccessibilityNodeInfoCompat] with information about the host view.
+       *
+       *
+       * The default implementation behaves as
+       * [ ViewCompat#onInitializeAccessibilityNodeInfo(View, AccessibilityNodeInfoCompat)][ViewCompat.onInitializeAccessibilityNodeInfo] for
+       * the case of no accessibility delegate been set.
+       *
+       *
+       * @param host The View hosting the delegate.
+       * @param info The instance to initialize.
+       *
+       * @see ViewCompat.onInitializeAccessibilityNodeInfo
+       */
+      override fun onInitializeAccessibilityNodeInfo(
+        host: View,
+        info: AccessibilityNodeInfoCompat
+      ) {
+        super.onInitializeAccessibilityNodeInfo(
+          host,
+          info
+        )
+
+        val clickPrefix = resources.getString(
+          if(fanSpeed != FanSpeed.HIGH) R.string.change
+          else R.string.reset
+        )
+        val clickDestination = resources.getString(
+          R.string.to_something,
+          resources.getString(fanSpeed.next().label),
+        )
+        val customClick = AccessibilityNodeInfoCompat.AccessibilityActionCompat(
+          AccessibilityNodeInfo.ACTION_CLICK,
+          "$clickPrefix $clickDestination"
+        )
+        info.addAction(customClick)
+      }
+    })
   }
 
   override fun onSizeChanged(
@@ -70,6 +115,10 @@ class DialView @JvmOverloads constructor(
     oldh: Int
   ) {
     radius = (min(h, w) / 2.0 * 0.8).toFloat()
+  }
+
+  private fun updateContentDesc() {
+    contentDescription = resources.getString(fanSpeed.label)
   }
 
   private fun getFanColor(): Int = when(fanSpeed) {
@@ -120,7 +169,7 @@ class DialView @JvmOverloads constructor(
     if(super.performClick()) return true
 
     fanSpeed = fanSpeed.next()
-    contentDescription = resources.getString(fanSpeed.label)
+    updateContentDesc()
 
     invalidate()
     return true

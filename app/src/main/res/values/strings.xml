@@ -1,8 +1,11 @@
 <resources>
     <string name="app_name">Fan Controller</string>
     <string name="fan_off">off</string>
-    <string name="fan_low">1</string>
-    <string name="fan_medium">2</string>
-    <string name="fan_high">3</string>
+    <string name="fan_low" translatable="false">1</string>
+    <string name="fan_medium" translatable="false">2</string>
+    <string name="fan_high" translatable="false">3</string>
     <string name="fan_controller">Fan Controller</string>
+    <string name="change">Change</string>
+    <string name="reset">Reset</string>
+    <string name="to_something">to %s</string>
 </resources>
